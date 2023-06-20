@@ -1,0 +1,41 @@
+{
+	"name": "customer_accounts",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./bin/www",
+	"scripts": {
+		"start": "per-env",
+		"start:development": "nodemon -r dotenv/config ./bin/www",
+		"start:production": "node ./bin/www",
+		"db-migrate-seed": "sequelize db:migrate && sequelize db:seed:all && nodemon ./bin/www",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@dr.pogodin/csurf": "^1.12.4",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"express": "^4.18.2",
+		"express-async-errors": "^3.1.1",
+		"express-validator": "^7.0.1",
+		"helmet": "^7.0.0",
+		"jsonwebtoken": "^9.0.0",
+		"morgan": "^1.10.0",
+		"p-iteration": "^1.1.8",
+		"per-env": "^1.0.2",
+		"pg": "^8.11.0",
+		"pg-hstore": "^2.3.4",
+		"sequelize": "^6.32.0",
+		"sequelize-cli": "^6.6.1"
+	},
+	"devDependencies": {
+		"dotenv": "^16.3.0",
+		"dotenv-cli": "^7.2.1",
+		"eslint": "^8.42.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-plugin-import": "^2.27.5",
+		"nodemon": "^2.0.22"
+	}
+}
