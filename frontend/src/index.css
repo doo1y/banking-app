@@ -1,0 +1,12 @@
+/* TODO Add site wide styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+	align-content: center;
+	background: radial-gradient(#e66465, #9198e5);
+}
