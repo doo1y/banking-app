@@ -10,7 +10,7 @@ function LoginFormPage() {
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState([]);
 
-	if (sessionUser) return <Redirect to='/' />;
+	if (sessionUser) return <Redirect to='/home/user/me' />;
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -26,7 +26,7 @@ function LoginFormPage() {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className='rounded-sm flex flex-col self-center gap-1 text-center bg-white w-80 px-8 h-96'>
+			className='justify-self-center rounded-sm flex flex-col self-center gap-1 text-center bg-white w-80 px-8 h-96'>
 			<div className='text-2xl font-semibold mt-11 mb-6'>LOGIN</div>
 			<ul>
 				{errors.map((error, idx) => (

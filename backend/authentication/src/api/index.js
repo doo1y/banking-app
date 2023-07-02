@@ -1,10 +1,8 @@
 const router = require("express").Router(),
-	sessionRouter = require("./session"),
+	authRouter = require("./auth"),
 	userRouter = require("./user");
 
-router.use("/session", sessionRouter);
-
-router.use("/user", userRouter);
+router.use("/auth", authRouter);
 
 router.post("/", (req, res) => {
 	res.json({ requestBody: req.body });

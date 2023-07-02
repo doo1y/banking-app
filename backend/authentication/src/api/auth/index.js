@@ -2,7 +2,8 @@ const router = require("express").Router();
 const asyncHandler = require("express-async-handler");
 const { check } = require("express-validator");
 const { handleValidationErrors } = require("../../../utils/validation");
-
+const cookieParser = require("cookie-parser");
+const { secret } = require("../../../config");
 const { setTokenCookie, restoreMember } = require("../../../utils/auth");
 const { Member } = require("../../../db/models");
 
@@ -42,6 +43,7 @@ router.post(
 		await setTokenCookie(res, member);
 
 		return res.json({
+			status: "a",
 			member,
 		});
 	})

@@ -1,10 +1,16 @@
 "use strict";
 const bcrypt = require("bcryptjs");
-const { Validator } = require("sequelize");
+
+const { Sequelize, Model, Validator } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-	const Member = sequelize.define(
-		"Member",
+	class Member extends Model {
+		static Associate(models) {
+			Member.hasMany(models.Account, { foreignKey: "member_id" });
+		}
+	}
+
+	Member.init(
 		{
 			f_name: {
 				type: DataTypes.TEXT,
@@ -89,15 +95,14 @@ module.exports = (sequelize, DataTypes) => {
 				currentMember: { attributes: { exclude: ["password_hash"] } },
 				loginMember: { attributes: {} },
 			},
+			sequelize,
+			modelName: "Member",
 		}
 	);
-	Member.associate = function (models) {
-		// associations can be defined here
-	};
 
 	Member.prototype.toSafeObject = function () {
-		const { id, username, email } = this;
-		return { id, username, email };
+		const { id, username, email, f_name, l_name, phone, createdAt } = this;
+		return { id, username, email, f_name, l_name, phone, createdAt };
 	};
 
 	Member.prototype.validatePassword = function (password) {

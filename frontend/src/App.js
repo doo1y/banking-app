@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoginFormPage from "./components/LoginFormPage";
+import UserHomePage from "./components/UserHomePage";
+import Navigation from "./components/Navigation";
+import UserAccountsPage from "./components/UserAccountsPage";
 import * as sessionActions from "./store/session";
 
 export default function App() {
 	const dispatch = useDispatch();
+
 	const [isLoaded, setIsLoaded] = useState(false);
 
 	useEffect(() => {
@@ -13,12 +17,23 @@ export default function App() {
 	}, [dispatch]);
 
 	return (
-		isLoaded && (
-			<Switch>
-				<Route path='/login'>
-					<LoginFormPage />
-				</Route>
-			</Switch>
-		)
+		<>
+			<Navigation isLoaded={isLoaded} />
+			<main className='h-full flex items-center justify-center'>
+				{isLoaded && (
+					<Switch>
+						<Route exact path='/login'>
+							<LoginFormPage />
+						</Route>
+						<Route exact path='/home/user/me/accounts'>
+							<UserAccountsPage />
+						</Route>
+						<Route exact path='/home/user/me'>
+							<UserHomePage />
+						</Route>
+					</Switch>
+				)}
+			</main>
+		</>
 	);
 }
