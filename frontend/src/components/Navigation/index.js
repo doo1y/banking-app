@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import * as sessionActions from "../../store/session";
+import { Redirect } from "react-router-dom";
 
 const Navigation = ({ isLoaded }) => {
 	const dispatch = useDispatch();
@@ -29,7 +30,13 @@ const Navigation = ({ isLoaded }) => {
 	);
 
 	return (
-		<nav className='flex absolute p-[1em] top-0 w-full justify-end items-center max-h-[60px] bg-white'>
+		<nav className='flex absolute p-[1em] top-0 w-full justify-between items-center max-h-[60px] bg-white'>
+			<NavLink to={sessionUser ? "/home/user/me" : "/"}>
+				<div className='text-3xl font-extrabold justify-self-start rounded-md border-double border-8 border-gray-400'>
+					BANK
+				</div>
+			</NavLink>
+
 			<div className='flex gap-5 mr-8'>{isLoaded && sessionLinks}</div>
 		</nav>
 	);

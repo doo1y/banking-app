@@ -101,8 +101,8 @@ module.exports = (sequelize, DataTypes) => {
 	);
 
 	Member.prototype.toSafeObject = function () {
-		const { id, username, email, f_name, l_name, phone, createdAt } = this;
-		return { id, username, email, f_name, l_name, phone, createdAt };
+		const { id, username, email } = this;
+		return { id, username, email };
 	};
 
 	Member.prototype.validatePassword = function (password) {
@@ -142,11 +142,11 @@ module.exports = (sequelize, DataTypes) => {
 		const member = await Member.create({
 			f_name,
 			l_name,
-			ssn,
-			dob,
-			phone,
 			username,
+			dob,
+			ssn,
 			email,
+			phone,
 			password_hash,
 		});
 

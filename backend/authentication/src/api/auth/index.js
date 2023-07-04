@@ -18,10 +18,74 @@ const validateLogin = [
 	handleValidationErrors,
 ];
 
+const validateSignup = [
+	check("f_name")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide your first name."),
+	check("l_name")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide a last name."),
+	check("email")
+		.exists({ checkFalsy: true })
+		.isEmail()
+		.withMessage("Please providea valid email."),
+	check("username")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide a valid username."),
+	check("dob")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide your date of birth."),
+	check("ssn")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide your ssn."),
+	check("phone")
+		.exists({ checkFalsy: true })
+		.withMessage("Please provide your phone number."),
+	check("password")
+		.exists({ checkFalsy: true })
+		.isLength({ min: 6 })
+		.withMessage("Password must be 6 characters or more."),
+	handleValidationErrors,
+];
+
 /* login page fetch api */
 router.get("/new", (req, res) => {
 	res.send("this page will have the login form");
 });
+
+router.post(
+	"/register",
+	validateSignup,
+	asyncHandler(async (req, res, next) => {
+		const { f_name, l_name, username, dob, ssn, phone, email, password } =
+			req.body;
+
+		const user = await Member.signup({
+			f_name,
+			l_name,
+			ssn,
+			dob,
+			username,
+			email,
+			phone,
+			password,
+		});
+
+		if (!user) {
+			const err = new Error("Login Failed");
+			err.status = 401;
+			err.title = "Login failed";
+			err.errors = ["The provided credentials were invalid"];
+			return next(err);
+		}
+
+		console.log(user);
+
+		setTokenCookie(res, user);
+
+		return res.json({ user });
+	})
+);
 
 /* authentication and session login uri */
 router.post(
@@ -30,9 +94,9 @@ router.post(
 	asyncHandler(async (req, res, next) => {
 		const { credential, password } = req.body;
 
-		const member = await Member.login({ credential, password });
+		const user = await Member.login({ credential, password });
 
-		if (!member) {
+		if (!user) {
 			const err = new Error("Login Failed");
 			err.status = 401;
 			err.title = "Login failed";
@@ -40,11 +104,11 @@ router.post(
 			return next(err);
 		}
 
-		await setTokenCookie(res, member);
+		setTokenCookie(res, user);
 
 		return res.json({
 			status: "a",
-			member,
+			user,
 		});
 	})
 );
@@ -61,7 +125,7 @@ router.get("/", restoreMember, (req, res) => {
 	const { member } = req;
 	if (member)
 		return res.json({
-			member: member.toSafeObject(),
+			user: member.toSafeObject(),
 		});
 	else return res.json({});
 });

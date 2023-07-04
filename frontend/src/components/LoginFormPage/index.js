@@ -26,15 +26,15 @@ function LoginFormPage() {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className='justify-self-center rounded-sm flex flex-col self-center gap-1 text-center bg-white w-80 px-8 h-96'>
-			<div className='text-2xl font-semibold mt-11 mb-6'>LOGIN</div>
+			className='justify-self-center rounded-sm flex flex-col self-center text-center bg-white px-5 py-16 w-96'>
+			<div className='text-4xl font-semibold mb-9'>Login</div>
 			<ul>
 				{errors.map((error, idx) => (
 					<li key={idx}>{error}</li>
 				))}
 			</ul>
 			<input
-				className='border-2 px-2 py-2 rounded-sm mb-2'
+				className='focus:border-b-2 focus:border-solid focus:border-cyan-500 text-md p-2.5 bg-gray-200 mb-5 border-solid border-2 border-gray-200 rounded-md outline-transparent'
 				placeholder='Username or Email'
 				type='text'
 				value={credential}
@@ -42,14 +42,14 @@ function LoginFormPage() {
 				required
 			/>
 			<input
-				className='border-2 px-2 py-2 rounded-sm mt-2'
+				className='focus:border-b-2 focus:border-solid focus:border-cyan-500 text-md p-2.5 bg-gray-200 mb-5 border-solid border-2 border-gray-200 rounded-md outline-transparent'
 				placeholder='Password'
 				type='password'
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				required
 			/>
-			<button className='bg-[#e66465] mt-10 rounded-sm h-11' type='submit'>
+			<button className='bg-[#e66465] mt-6 rounded-sm h-11' type='submit'>
 				Login
 			</button>
 		</form>

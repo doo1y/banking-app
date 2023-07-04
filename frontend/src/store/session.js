@@ -59,8 +59,10 @@ export const logout = () => async (dispatch) => {
 		method: "DELETE",
 	});
 
+	const data = await res.json();
+
 	dispatch(removeUser());
-	return res;
+	return data;
 };
 
 export const login =
@@ -76,7 +78,7 @@ export const login =
 
 		const data = await response.json();
 
-		dispatch(setUser(data.member));
+		dispatch(setUser(data.user));
 		return response;
 	};
 
@@ -103,6 +105,30 @@ export const getAccounts = () => async (dispatch) => {
 	dispatch(setAccounts(data.accounts));
 	return res;
 };
+
+export const signup =
+	({ f_name, l_name, username, dob, ssn, phone, email, password }) =>
+	async (dispatch) => {
+		const res = await csrfFetch("/api/v1/auth/register", {
+			method: "POST",
+			body: JSON.stringify({
+				f_name: f_name,
+				l_name: l_name,
+				username: username,
+				dob: dob,
+				ssn: ssn,
+				phone: phone,
+				email: email,
+				password: password,
+			}),
+		});
+
+		const data = await res.json();
+
+		dispatch(setUser(data.user));
+
+		return res;
+	};
 
 export const getAccount = (uri) => async (dispatch) => {
 	const res = await csrfFetch(uri);

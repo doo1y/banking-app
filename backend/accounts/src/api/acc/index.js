@@ -7,6 +7,8 @@ const { validateToken } = require("../../../utils");
 
 router.use("/:accountId/transactions", txnRouter);
 
+router.put("/");
+
 router.get(
 	"/:accountId",
 	validateToken,
