@@ -1,11 +1,13 @@
 /* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Redirect, NavLink } from "react-router-dom";
+import { useHistory, NavLink } from "react-router-dom";
 import * as sessionActions from "../../store/session";
 import Sidebar from "../Sidebar";
 
 function NewAccountForm({ user }) {
+	const history = useHistory();
+
 	const dispatch = useDispatch();
 
 	const [accountsRetrived, setAccountsRetrived] = useState(false);
@@ -33,17 +35,13 @@ function NewAccountForm({ user }) {
 		const reqBody = {
 			accn: formData.extAcc,
 			balance: formData.balance,
-			acc_type: formData.accType,
-			network: formData.network,
-			existingBalance: maxBalance,
+			accType: formData.accType,
+			paymentNetwork: formData.network,
+			accnBalance: maxBalance,
 		};
 
-		console.log(reqBody);
-
-		// return dispatch(sessionActions.createAccount(reqBody));
-		// .then( () => {
-		// 	history.push("/accounts");
-		// });
+		let res = dispatch(sessionActions.createAccount(reqBody));
+		console.log(res);
 	}
 
 	function handleOnChange(e) {
@@ -73,7 +71,7 @@ function NewAccountForm({ user }) {
 					<h1 className='text-3xl mb-8'>Open a New Account</h1>
 
 					<form className='flex flex-col gap-3' onSubmit={handleSubmit}>
-						<label className='text-[#00000077]' for='userAccountsList'>
+						<label className='text-[#00000077]'>
 							Select an account to transfer from:
 						</label>
 						<select
@@ -106,6 +104,7 @@ function NewAccountForm({ user }) {
 								type='number'
 								max={Number(maxBalance)}
 								min='0'
+								step={0.01}
 								required
 								disabled={!user.accounts.length}
 								placeholder={`${maxBalance} (max)`}
@@ -117,7 +116,7 @@ function NewAccountForm({ user }) {
 								Please select the type of account to open:
 							</p>
 							<label>
-								<input type='radio' name='accType' value='C' n />
+								<input type='radio' name='accType' value='C' />
 								&nbsp;Checking
 							</label>
 							<label>
@@ -138,7 +137,7 @@ function NewAccountForm({ user }) {
 								Plase select a payment processing network:
 							</p>
 							<label>
-								<input type='radio' name='network' value='VISA' n />
+								<input type='radio' name='network' value='VISA' />
 								&nbsp;VISA
 							</label>
 							<label>

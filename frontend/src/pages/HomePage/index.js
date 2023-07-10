@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import LoginForm from "../../components/LoginForm";
-import { useSelector } from "react-redux";
+
+import { Redirect } from "react-router-dom";
 
 function HomePage({ user }) {
 	const loginFormClassObject = {
@@ -23,8 +24,8 @@ function HomePage({ user }) {
 				className='rounded-b-xl min-h-[90px] bg-[#ffffff80] pt-1'>
 				<div className=' flex flex-col justify-center ml-5'>
 					<a href='/'>Forgot Username or Password?</a>
-					<a href=''>Security Center</a>
-					<a href=''>Privacy, Cookies, and Legal</a>
+					<a href='/'>Security Center</a>
+					<a href='/'>Privacy, Cookies, and Legal</a>
 				</div>
 			</div>
 		</div>
@@ -47,6 +48,7 @@ function HomePage({ user }) {
 				data-v-8fcb32d4=''
 				style={{ opacity: 1 }}
 				src='https://simey-credit-card.netlify.app/img/logos/master.svg'
+				alt='card logo'
 			/>
 
 			<div class='chip'>
@@ -63,6 +65,8 @@ function HomePage({ user }) {
 			</svg>
 		</aside>
 	);
+
+	if (user) return <Redirect to='/home' />;
 
 	return (
 		<div className='w-full min-h-[423px] py-40 items-center'>

@@ -1,0 +1,18 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "concurrently \"npm run accounts\" \"npm run auth\"",
+        "accounts": "npm start --prefix ./accounts/",
+        "auth": "npm start --prefix ./authentication/"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.2.0"
+    }
+}

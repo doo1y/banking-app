@@ -17,36 +17,41 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			account_number: {
 				type: DataTypes.TEXT,
+				allowNull: false,
 				validate: {
 					isCreditCard: true,
-					allowNull: false,
+					notNull: true,
 					notEmpty: true,
 				},
 			},
 			member_id: {
 				type: DataTypes.INTEGER,
+				allowNull: false,
 				validate: {
-					allowNull: false,
+					notNull: true,
 				},
 			},
 			acc_type: {
 				type: DataTypes.ENUM,
+				allowNull: false,
 				values: ["C", "S", "CD", "MMA"],
 				validate: {
-					allowNull: false,
+					notNull: true,
 					notEmpty: true,
 				},
 			},
 			payment_network: {
 				type: DataTypes.ENUM,
+				allowNull: false,
 				values: ["V", "MC", "AMEX", "DC"],
 				validate: {
-					allowNull: false,
+					notNull: true,
 					notEmpty: true,
 				},
 			},
 			balance: {
 				type: DataTypes.FLOAT,
+				defaultValue: 0.0,
 				validate: { isFloat: true },
 			},
 			isOpen: {
@@ -58,8 +63,9 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: new Date(
 					new Date().setFullYear(new Date().getFullYear() + 2)
 				),
+				allowNull: false,
 				validate: {
-					allowNull: false,
+					notNull: true,
 					isDate: true,
 				},
 			},
@@ -73,6 +79,7 @@ module.exports = (sequelize, DataTypes) => {
 						"account_type",
 						"isOpen",
 						"member_id",
+						"payment_network",
 						"isOpen",
 						"exp",
 						"created_at",
@@ -81,7 +88,7 @@ module.exports = (sequelize, DataTypes) => {
 				},
 			},
 			scopes: {
-				getBalance: {
+				retriveBalance: {
 					attributes: {
 						exclude: [
 							"account_number",
@@ -89,6 +96,7 @@ module.exports = (sequelize, DataTypes) => {
 							"isOpen",
 							"member_id",
 							"isOpen",
+							"payment_network",
 							"exp",
 							"created_at",
 							"updatedAt",
@@ -110,50 +118,42 @@ module.exports = (sequelize, DataTypes) => {
 	);
 
 	Account.createAccount = async function (userData) {
-		var { account_number, member_id, acc_type, balance, payment_network } =
-			userData;
+		const { Op } = require("sequelize");
+		var { accn, memberId, accType, balance, paymentNetwork } = userData;
+		console.log(balance);
 		var exp = new Date(new Date().setFullYear(new Date().getFullYear() + 2));
 		var isOpen = true;
-		// throws error if provided invalid balance
-		// checks that transferring balance is above 0, and an account number
-		// to withdraw from is provided
-		if (extAccountNumber && balance > 0) {
-			existingAccount = await Account.scope("checkBalance").findOne({
+
+		if (balance) {
+			var account = await Account.scope("retriveBalance").findOne({
 				where: {
-					[Op.and]: [
-						{ account_number: extAccountNumber },
-						{ member_id: memberId },
-					],
+					[Op.and]: [{ account_number: accn }, { member_id: memberId }],
 				},
 			});
-			if (existingAccount.balance < balance)
-				throw new Error("Not enough funds!");
-			existingAccount.balance -= balance;
-			await existingAccount.save();
+			if (!account) throw new Error("Transferring Account Not found");
+			if (account.balance < balance) throw new Error("Not enough funds!");
+			account.balance -= balance;
+
+			await account.save();
 		}
 
-		account_number = generater.GenCC(network);
-		payment_network =
-			network === "VISA"
-				? "V"
-				: network === "MasterCard"
-				? "MC"
-				: network === "Amex"
-				? "AMEX"
-				: network === "Discover"
-				? "DC"
-				: "V";
+		var accountNumber = generater.GenCC(paymentNetwork).pop();
+		console.log(`\n\n\n\n\n${JSON.stringify(newAcc)}\n\n\n\n\n`);
 
-		newAcc = await Account.create({
-			account_number,
-			member_id,
-			acc_type,
-			payment_network,
+		var newAcc = Account.build({
+			account_number: accountNumber,
+			member_id: memberId,
+			acc_type: accType,
+			payment_network: paymentNetwork,
 			balance,
 			isOpen,
+			exp,
 		});
-
-		return await Account.scope("selectedAccount").findByPk(newAcc.id);
+		console.log(`\n\n\n\n\n${JSON.stringify(newAcc)}\n\n\n\n\n`);
+		if (newAcc) {
+			await newAcc.save();
+			return await Account.scope("selectedAccount").findByPk(newAcc.id);
+		} else throw new Error("account not");
 	};
 
 	Account.getAllAccounts = async function (memberId) {

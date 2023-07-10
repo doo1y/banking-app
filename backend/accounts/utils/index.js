@@ -6,57 +6,48 @@ const { Op } = require("sequelize");
 const { secret, expiresIn } = jwtConfig;
 
 const constructAccountData = async (req, res, next) => {
-	var { accn, balance, acc_type, network } = req.body;
-	accn = !accn || !balance ? "" : accn;
+	var { accn, balance, accType, paymentNetwork, accnBalance } = req.body;
 	if (!req.currUser) {
 		return next();
 	}
 	req.errorList = new Array();
-	let sender;
+
 	try {
 		if (
-			!network ||
-			!["VISA", "MasterCard", "Amex", "Discover"].includes(network)
-		) {
+			!paymentNetwork ||
+			!["VISA", "MasterCard", "Amex", "Discover"].includes(paymentNetwork)
+		)
 			req.errorList.push("Please provide a valid transfer network provider");
-		}
-		if (!acc_type || !["C", "S", "CD", "MMA"].includes(acc_type)) {
+		req.body.paymentNetwork =
+			paymentNetwork === "VISA"
+				? "V"
+				: paymentNetwork === "MasterCard"
+				? "MC"
+				: paymentNetwork === "Amex"
+				? "AMEX"
+				: paymentNetwork === "Discover"
+				? "DC"
+				: "V";
+		if (!accType || !["C", "S", "CD", "MMA"].includes(accType))
 			req.errorList.push("Please provide a valid account type");
-		}
+
 		if (balance) {
 			if (balance < 0) {
 				req.errorList.push("Balance amount cannot be smaller than 0");
 			}
-			if (balance > 0) {
-				if (!accn)
-					req.errorList.push("An account to transfer funds from required");
-				sender = await Account.scope("getBalance").findOne({
-					where: {
-						[Op.and]: [
-							{ account_number: accn },
-							{ member_id: req.currUser.id },
-						],
-					},
-				});
-				if (!sender) req.errorList.push("Transferring account not found");
-				if (sender.balance < balance)
-					req.errorList.push("Insufficient funds in selected account");
-				sender.balance -= balance;
-				await sender.save();
-			}
+			if (!accn)
+				req.errorList.push("An account to transfer funds from required");
+			if (accnBalance < balance)
+				req.errorList.push("Insufficient funds in selected account");
 		}
+
 		if (req.errorList.length) return next();
 	} catch (e) {
 		req.errorList.push(e);
 		return next();
 	}
 
-	req.body = {
-		member_id: req.currUser.id,
-		acc_type: acc_type,
-		payment_network: network,
-		balance: balance,
-	};
+	req.body.memberId = req.currUser.id;
 
 	return next();
 };

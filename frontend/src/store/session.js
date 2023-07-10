@@ -126,14 +126,14 @@ export const createAccount = (reqBody) => async (dispatch) => {
 		body: JSON.stringify(reqBody),
 	});
 
-	const data = await res.json();
-	dispatch(setAccount(data.accounts));
+	return await res.json();
 };
+
 export const getAccount = (uri) => async (dispatch) => {
 	const res = await csrfFetch(uri);
 
 	const data = await res.json();
-	// dispatch(setAccount(data.account));
+	dispatch(setAccount(data.account));
 	return res;
 };
 

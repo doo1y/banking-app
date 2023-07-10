@@ -75,13 +75,16 @@ router.post(
 			err.status(401);
 			return next(err);
 		}
+		try {
+			var account = await Account.createAccount(req.body);
 
-		const newAcc = await Account.createAccount(req.body);
-		const accounts = await Account.getAllAccounts(req.currUser.id);
-		res.json({
-			accounts: [...accounts],
-			newAccount: newAcc,
-		});
+			res.json({
+				account,
+			});
+		} catch (e) {
+			console.log(e);
+			next(e);
+		}
 	})
 );
 
