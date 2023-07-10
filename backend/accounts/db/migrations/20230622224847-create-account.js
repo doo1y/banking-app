@@ -28,7 +28,7 @@ module.exports = {
 				/* 
           C - Checking
           S - Savings
-          CD - Certificate of Deposite
+          CD - Certificate of Deposit
           MMA - Money Market Account
         */
 				type: Sequelize.DataTypes.ENUM("C", "S", "CD", "MMA"),
@@ -55,7 +55,7 @@ module.exports = {
 			},
 			exp: {
 				type: Sequelize.DataTypes.DATE,
-				allowNull: false,
+				alloywNull: false,
 				// sets the default value of exp date to two years starting from now
 				defaultValue: new Date(
 					new Date().setFullYear(new Date().getFullYear() + 2)

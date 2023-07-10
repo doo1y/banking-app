@@ -86,7 +86,7 @@ export const restore = () => async (dispatch) => {
 	const res = await csrfFetch("/api/v1/auth");
 
 	const data = await res.json();
-	dispatch(setUser(data.member));
+	dispatch(setUser(data.user));
 	return res;
 };
 
@@ -106,35 +106,34 @@ export const getAccounts = () => async (dispatch) => {
 	return res;
 };
 
-export const signup =
-	({ f_name, l_name, username, dob, ssn, phone, email, password }) =>
-	async (dispatch) => {
-		const res = await csrfFetch("/api/v1/auth/register", {
-			method: "POST",
-			body: JSON.stringify({
-				f_name: f_name,
-				l_name: l_name,
-				username: username,
-				dob: dob,
-				ssn: ssn,
-				phone: phone,
-				email: email,
-				password: password,
-			}),
-		});
+export const signup = (reqBody) => async (dispatch) => {
+	const res = await csrfFetch("/api/v1/auth/register", {
+		method: "POST",
+		body: JSON.stringify(reqBody),
+	});
 
-		const data = await res.json();
+	const data = await res.json();
 
-		dispatch(setUser(data.user));
+	dispatch(setUser(data.user));
 
-		return res;
-	};
+	return res;
+};
 
+// extAccountNumber, balance, memberId, acc_type, network
+export const createAccount = (reqBody) => async (dispatch) => {
+	const res = await csrfFetch("/api/v1/accounts/new", {
+		method: "POST",
+		body: JSON.stringify(reqBody),
+	});
+
+	const data = await res.json();
+	dispatch(setAccount(data.accounts));
+};
 export const getAccount = (uri) => async (dispatch) => {
 	const res = await csrfFetch(uri);
 
 	const data = await res.json();
-	dispatch(setAccount(data.account));
+	// dispatch(setAccount(data.account));
 	return res;
 };
 

@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const generater = require("creditcard-generator");
 
 module.exports = (sequelize, DataTypes) => {
 	class Account extends Model {
@@ -54,6 +55,9 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			exp: {
 				type: DataTypes.DATE,
+				defaultValue: new Date(
+					new Date().setFullYear(new Date().getFullYear() + 2)
+				),
 				validate: {
 					allowNull: false,
 					isDate: true,
@@ -77,9 +81,23 @@ module.exports = (sequelize, DataTypes) => {
 				},
 			},
 			scopes: {
+				getBalance: {
+					attributes: {
+						exclude: [
+							"account_number",
+							"account_type",
+							"isOpen",
+							"member_id",
+							"isOpen",
+							"exp",
+							"created_at",
+							"updatedAt",
+						],
+					},
+				},
 				memberAccounts: {
 					attributes: {
-						exclude: ["id", "balance", "member_id", "created_at", "updatedAt"],
+						exclude: ["id", "member_id", "created_at", "updatedAt"],
 					},
 				},
 				selectedAccount: {
@@ -91,15 +109,42 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	);
 
-	Account.createNewAccount = async function (
-		account_number,
-		member_id,
-		acc_type,
-		payment_network,
-		balance = 0,
-		isOpen = true
-	) {
-		const newAcc = await Account.create({
+	Account.createAccount = async function (userData) {
+		var { account_number, member_id, acc_type, balance, payment_network } =
+			userData;
+		var exp = new Date(new Date().setFullYear(new Date().getFullYear() + 2));
+		var isOpen = true;
+		// throws error if provided invalid balance
+		// checks that transferring balance is above 0, and an account number
+		// to withdraw from is provided
+		if (extAccountNumber && balance > 0) {
+			existingAccount = await Account.scope("checkBalance").findOne({
+				where: {
+					[Op.and]: [
+						{ account_number: extAccountNumber },
+						{ member_id: memberId },
+					],
+				},
+			});
+			if (existingAccount.balance < balance)
+				throw new Error("Not enough funds!");
+			existingAccount.balance -= balance;
+			await existingAccount.save();
+		}
+
+		account_number = generater.GenCC(network);
+		payment_network =
+			network === "VISA"
+				? "V"
+				: network === "MasterCard"
+				? "MC"
+				: network === "Amex"
+				? "AMEX"
+				: network === "Discover"
+				? "DC"
+				: "V";
+
+		newAcc = await Account.create({
 			account_number,
 			member_id,
 			acc_type,
@@ -112,7 +157,7 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	Account.getAllAccounts = async function (memberId) {
-		const accounts = Account.scope("memberAccounts").findAll({
+		const accounts = await Account.scope("memberAccounts").findAll({
 			where: {
 				member_id: memberId,
 			},
@@ -120,7 +165,8 @@ module.exports = (sequelize, DataTypes) => {
 
 		if (!accounts) {
 			throw new Error("Account Unavailable");
-		} else return accounts;
+		}
+		return accounts;
 	};
 
 	Account.getSelectedAccount = async function (accountId, memberId) {

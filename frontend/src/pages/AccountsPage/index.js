@@ -3,21 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router-dom";
 import * as sessionActions from "../../store/session";
 
-function UserAccountsPage() {
+function UserAccountsPage({ user }) {
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const sessionUser = useSelector((state) => state.session.user);
+
 	const [accountsRetrived, setAccountsRetrived] = useState(false);
 
 	useEffect(() => {
-		dispatch(sessionActions.getAccounts()).then(() =>
-			setAccountsRetrived(true)
-		);
-	}, []);
+		if (!user.accounts)
+			dispatch(sessionActions.getAccounts()).then(() =>
+				setAccountsRetrived(true)
+			);
+	});
 
 	const handleCardClick = (e, accountId) => {
 		e.preventDefault();
-		const uri = `/home/user/me/account/${accountId}`;
+		const uri = `/accounts/${accountId}`;
 		dispatch(sessionActions.getAccount(uri)).then(() => history.push(uri));
 	};
 	const colors = [
@@ -33,7 +34,7 @@ function UserAccountsPage() {
 		"#b0d0d3",
 	];
 
-	if (!sessionUser) return <Redirect to='/login' />;
+	if (!user) return <Redirect to='/login' />;
 
 	const getNetwork = (network) =>
 		network === "V"
@@ -64,7 +65,7 @@ function UserAccountsPage() {
 	return (
 		accountsRetrived && (
 			<div className='grid grid-cols-2'>
-				{sessionUser.accounts.map((account, idx) => {
+				{user.accounts.map((account, idx) => {
 					return generateCard(account, account.id);
 				})}
 			</div>

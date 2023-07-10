@@ -79,8 +79,6 @@ router.post(
 			return next(err);
 		}
 
-		console.log(user);
-
 		setTokenCookie(res, user);
 
 		return res.json({ user });
@@ -125,7 +123,7 @@ router.get("/", restoreMember, (req, res) => {
 	const { member } = req;
 	if (member)
 		return res.json({
-			user: member.toSafeObject(),
+			user: member,
 		});
 	else return res.json({});
 });

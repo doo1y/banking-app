@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const txnRouter = require("../transaction");
 const { Account } = require("../../../db/models");
 
-const { validateToken } = require("../../../utils");
+const { validateToken, constructAccountData } = require("../../../utils");
 
 router.use("/:accountId/transactions", txnRouter);
 
@@ -48,13 +48,40 @@ router.get(
 		}
 		try {
 			const accounts = await Account.getAllAccounts(req.currUser.id);
-
 			res.json({
-				accounts: [...accounts],
+				accounts,
 			});
 		} catch (e) {
 			next(e);
 		}
+	})
+);
+
+router.post(
+	"/new",
+	validateToken,
+	constructAccountData,
+	asyncHandler(async (req, res, next) => {
+		if (!req.currUser) {
+			const err = new Error("Please Log Back In");
+			err.title = "Session Timed Out";
+			err.errors = ["No logged in user"];
+			err.status = 401;
+			return next(err);
+		} else if (req.errorList.length) {
+			const err = new Error("Data validation failed");
+			err.title = "Invalid parameters";
+			err.errors = req.errorList;
+			err.status(401);
+			return next(err);
+		}
+
+		const newAcc = await Account.createAccount(req.body);
+		const accounts = await Account.getAllAccounts(req.currUser.id);
+		res.json({
+			accounts: [...accounts],
+			newAccount: newAcc,
+		});
 	})
 );
 

@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import HomePage from "./components/HomePage";
-import LoginFormPage from "./components/LoginFormPage";
-import UserHomePage from "./components/UserHomePage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import UserHomePage from "./pages/UserHomePage";
 import Navigation from "./components/Navigation";
-import UserAccountsPage from "./components/UserAccountsPage";
-import RegisterationFormPage from "./components/RegisterationFormPage";
+import AccountsPage from "./pages/AccountsPage";
+import AccountDetailsPage from "./pages/AccountDetailsPage";
+import NewAccountForm from "./components/NewAccountForm";
+import UserDetailsPage from "./pages/UserDetailsPage";
+import RegisterationPage from "./pages/Registeration";
 
 import * as sessionActions from "./store/session";
 
 export default function App() {
 	const dispatch = useDispatch();
+	const user = useSelector((state) => state.session.user);
 
 	const [isLoaded, setIsLoaded] = useState(false);
 
@@ -21,24 +25,33 @@ export default function App() {
 
 	return (
 		<>
-			<Navigation isLoaded={isLoaded} />
-			<main className='h-full flex items-center justify-center'>
+			<Navigation isLoaded={isLoaded} user={user} />
+			<main className='h-full w-full pt-[59px] flex my-0 mx-auto'>
 				{isLoaded && (
 					<Switch>
 						<Route exact path='/'>
-							<HomePage />
+							<HomePage user={user} />
 						</Route>
 						<Route exact path='/login'>
-							<LoginFormPage />
+							<LoginPage user={user} />
 						</Route>
 						<Route exact path='/signup'>
-							<RegisterationFormPage />
+							<RegisterationPage user={user} />
 						</Route>
-						<Route exact path='/home/user/me/accounts'>
-							<UserAccountsPage />
+						<Route exact path='/accounts'>
+							<AccountsPage user={user} />
 						</Route>
-						<Route exact path='/home/user/me'>
-							<UserHomePage />
+						<Route exact path='/accounts/new'>
+							<NewAccountForm user={user} />
+						</Route>
+						<Route exact path='/accounts/:accountId'>
+							<AccountDetailsPage user={user} />
+						</Route>
+						<Route exact path='/home'>
+							<UserHomePage user={user} />
+						</Route>
+						<Route exact path='/users/me/profile'>
+							<UserDetailsPage user={user} />
 						</Route>
 					</Switch>
 				)}
